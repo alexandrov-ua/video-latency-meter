@@ -18,7 +18,7 @@
 
 .controls {
   position: fixed;
-  bottom: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -30,6 +30,7 @@
   border-radius: 999px;
   padding: 10px 20px;
   color: #fff;
+  white-space: nowrap;
 }
 
 .label {

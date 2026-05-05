@@ -3,26 +3,26 @@
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   color: #fff;
-  min-width: 210px;
+  width: clamp(150px, 40vw, 210px);
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px 12px;
-  margin-bottom: 10px;
+  gap: 6px 8px;
+  margin-bottom: 8px;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .label {
-  font-size: 10px;
+  font-size: clamp(8px, 2vw, 10px);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -30,7 +30,7 @@
 }
 
 .value {
-  font-size: 18px;
+  font-size: clamp(13px, 3.5vw, 18px);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: #fff;
@@ -38,7 +38,7 @@
 }
 
 .unit {
-  font-size: 11px;
+  font-size: clamp(9px, 2vw, 11px);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -48,11 +48,11 @@
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
+  padding-top: 6px;
 }
 
 .count {
-  font-size: 11px;
+  font-size: clamp(9px, 2vw, 11px);
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -61,7 +61,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
   color: #fff;
-  font-size: 11px;
+  font-size: clamp(9px, 2vw, 11px);
   padding: 3px 10px;
   cursor: pointer;
   transition: background 0.15s;

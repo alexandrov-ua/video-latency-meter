@@ -44,10 +44,10 @@
 
 ## 7. Polish & iOS Compatibility
 
-- [ ] 7.1 Ensure the app is fully usable on iOS Safari (camera permissions, `getUserMedia` constraints)
-- [ ] 7.2 Make the layout responsive for both mobile and desktop
-- [ ] 7.3 Test camera selection on iOS (front camera + multiple back cameras)
-- [ ] 7.4 Verify QR decode performance meets real-time requirements on a mid-range mobile device
+- [x] 7.1 Ensure the app is fully usable on iOS Safari (camera permissions, `getUserMedia` constraints)
+- [x] 7.2 Make the layout responsive for both mobile and desktop
+- [x] 7.3 Test camera selection on iOS (front camera + multiple back cameras)
+- [x] 7.4 Verify QR decode performance meets real-time requirements on a mid-range mobile device
 
 ## 8. Fix Measurement Offset
 
