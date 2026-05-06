@@ -22,6 +22,13 @@
   height: 100% !important;
 }
 
+.overlayTopLeft {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 10;
+}
+
 .overlayLeft {
   position: fixed;
   bottom: max(16px, env(safe-area-inset-bottom));

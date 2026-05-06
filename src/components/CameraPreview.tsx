@@ -1,6 +1,3 @@
-import { useEffect, useRef } from 'react'
-import { useQRScanner } from '../hooks/useQRScanner'
-import type { ScanResult } from '../hooks/useQRScanner'
 import styles from './CameraPreview.module.css'
 
 interface Props {
@@ -8,18 +5,10 @@ interface Props {
   devices: MediaDeviceInfo[]
   deviceId: string
   onDeviceChange: (id: string) => void
-  onScan: (result: ScanResult) => void
+  isTracking: boolean
 }
 
-export default function CameraPreview({ videoRef, devices, deviceId, onDeviceChange, onScan }: Props) {
-  const { isTracking, result } = useQRScanner(videoRef)
-  const onScanRef = useRef(onScan)
-  onScanRef.current = onScan
-
-  useEffect(() => {
-    if (result) onScanRef.current(result)
-  }, [result])
-
+export default function CameraPreview({ videoRef, devices, deviceId, onDeviceChange, isTracking }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.videoWrapper}>

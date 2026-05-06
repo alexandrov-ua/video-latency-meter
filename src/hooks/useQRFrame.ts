@@ -25,35 +25,43 @@ export function useQRFrame() {
   const [qrValue, setQrValue] = useState<string>(() =>
     encodeQRPayload({ frame: 0, ts: Date.now() })
   )
+  const [frameId, setFrameId] = useState(0)
+  const [displayFps, setDisplayFps] = useState(0)
   const frameRef = useRef(0)
   const rafRef = useRef(0)
   const rafCallbackTsRef = useRef(Date.now())
-
-  // Running average of the render pipeline overhead:
-  //   rAF callback fires → React re-renders → useLayoutEffect fires (≈ paint)
-  // This is the systematic gap that inflates every latency reading.
   const renderOffsetRef = useRef(0)
 
   useEffect(() => {
-    function tick() {
+    let fpsCount = 0
+    let fpsWindowStart = performance.now()
+
+    function tick(timestamp: DOMHighResTimeStamp) {
       frameRef.current += 1
+      fpsCount++
+
+      if (timestamp - fpsWindowStart >= 1000) {
+        setDisplayFps(Math.round(fpsCount * 1000 / (timestamp - fpsWindowStart)))
+        fpsCount = 0
+        fpsWindowStart = timestamp
+      }
+
       rafCallbackTsRef.current = Date.now()
-      setQrValue(encodeQRPayload({ frame: frameRef.current, ts: rafCallbackTsRef.current }))
+      const next = encodeQRPayload({ frame: frameRef.current, ts: rafCallbackTsRef.current })
+      setQrValue(next)
+      setFrameId(frameRef.current)
       rafRef.current = requestAnimationFrame(tick)
     }
     rafRef.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 
-  // Fires after every QR commit, synchronously before browser paint.
-  // Measures how long React took to process the rAF-triggered state update.
   useLayoutEffect(() => {
     const offset = Date.now() - rafCallbackTsRef.current
     if (offset >= 0 && offset < 500) {
-      // Exponential moving average (α = 0.1) — stabilises in ~30 frames
       renderOffsetRef.current = renderOffsetRef.current * 0.9 + offset * 0.1
     }
   }, [qrValue])
 
-  return { qrValue, renderOffsetRef }
+  return { qrValue, renderOffsetRef, frameId, displayFps }
 }

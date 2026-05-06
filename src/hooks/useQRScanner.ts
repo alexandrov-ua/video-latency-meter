@@ -20,6 +20,7 @@ const perfToDateOffset = Date.now() - performance.now()
 export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>) {
   const [result, setResult] = useState<ScanResult | null>(null)
   const [isTracking, setIsTracking] = useState(false)
+  const [cameraFps, setCameraFps] = useState(0)
   const isTrackingRef = useRef(false)
   const lastSuccessRef = useRef(0)
   const rafRef = useRef(0)
@@ -28,20 +29,25 @@ export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d', { willReadFrequently: true })!
 
-    // Accurate camera capture time in Date.now() domain.
-    // null = requestVideoFrameCallback not yet available or not supported.
     let captureTimeMs: number | null = null
     let vfcActive = true
     let vfcSetup = false
+    let vfcFrameCount = 0
+    let vfcWindowStart = performance.now()
 
     function setupCaptureTracking(video: HTMLVideoElement) {
       if (!('requestVideoFrameCallback' in video)) return
 
-      const onFrame = (_: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata) => {
+      const onFrame = (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata) => {
         if (!vfcActive) return
         if (metadata.captureTime !== undefined) {
-          // captureTime is in performance.now() domain — convert to Date.now()
           captureTimeMs = metadata.captureTime + perfToDateOffset
+        }
+        vfcFrameCount++
+        if (now - vfcWindowStart >= 1000) {
+          setCameraFps(Math.round(vfcFrameCount * 1000 / (now - vfcWindowStart)))
+          vfcFrameCount = 0
+          vfcWindowStart = now
         }
         video.requestVideoFrameCallback(onFrame)
       }
@@ -99,5 +105,5 @@ export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>)
     }
   }, [videoRef])
 
-  return { result, isTracking }
+  return { result, isTracking, cameraFps }
 }
