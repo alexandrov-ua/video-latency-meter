@@ -9,7 +9,7 @@ import styles from './MainPage.module.css'
 export default function MainPage() {
   const { qrValue, renderOffsetRef } = useQRFrame()
   const { videoRef, devices, deviceId, setDeviceId } = useCamera()
-  const { samples, addScan, reset } = useLatency(renderOffsetRef)
+  const { samples, totalCount, addScan, reset } = useLatency(renderOffsetRef)
 
   return (
     <div className={styles.page}>
@@ -23,7 +23,7 @@ export default function MainPage() {
       </div>
 
       <div className={styles.overlayLeft}>
-        <StatsPanel samples={samples} onReset={reset} />
+        <StatsPanel samples={samples} totalCount={totalCount} onReset={reset} />
       </div>
 
       <div className={styles.overlayRight}>

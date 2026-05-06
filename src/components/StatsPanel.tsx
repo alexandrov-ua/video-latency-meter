@@ -4,6 +4,7 @@ import styles from './StatsPanel.module.css'
 
 interface Props {
   samples: number[]
+  totalCount: number
   onReset: () => void
 }
 
@@ -15,7 +16,7 @@ function readStoredBaseline(): number {
   try { return Number(localStorage.getItem('vlm-baseline') ?? '0') } catch { return 0 }
 }
 
-export default function StatsPanel({ samples, onReset }: Props) {
+export default function StatsPanel({ samples, totalCount, onReset }: Props) {
   const [baseline, setBaseline] = useState(readStoredBaseline)
 
   const raw = useMemo(() => computeStats(samples), [samples])
@@ -62,7 +63,9 @@ export default function StatsPanel({ samples, onReset }: Props) {
       </div>
       <div className={styles.footer}>
         <div className={styles.footerTop}>
-          <span className={styles.count}>{stats ? `${stats.count} samples` : 'No data'}</span>
+          <span className={styles.count}>
+            {totalCount > 0 ? `${totalCount} samples (${samples.length})` : 'No data'}
+          </span>
           {baseline > 0 && (
             <button className={styles.baselineBadge} onClick={handleClearBaseline}>
               -{baseline.toFixed(0)}ms ✕
