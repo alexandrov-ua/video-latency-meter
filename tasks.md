@@ -53,7 +53,7 @@
 
 The app currently over-reports latency by ~150–250 ms. The likely cause is that `payload.ts` is stamped at the `requestAnimationFrame` callback time, but the QR code doesn't actually appear on screen until the browser composites and paints the frame — which happens several milliseconds later. This systematic offset inflates every measurement.
 
-- [ ] 8.1 Investigate the gap between rAF callback and actual screen paint (e.g. using `requestAnimationFrame` timestamp vs `Date.now()`)
-- [ ] 8.2 Investigate whether display refresh delay (double-buffering, vsync) contributes to the offset
-- [ ] 8.3 Implement a correction strategy (e.g. stamp the QR with `performance.now()` at paint time using a commit-phase trick, or subtract a calibrated screen-render offset)
+- [x] 8.1 Investigate the gap between rAF callback and actual screen paint (e.g. using `requestAnimationFrame` timestamp vs `Date.now()`)
+- [x] 8.2 Investigate whether display refresh delay (double-buffering, vsync) contributes to the offset
+- [x] 8.3 Implement a correction strategy (e.g. stamp the QR with `performance.now()` at paint time using a commit-phase trick, or subtract a calibrated screen-render offset)
 - [ ] 8.4 Verify the fix using the `/test` page with a known artificial delay

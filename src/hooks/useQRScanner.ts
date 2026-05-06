@@ -5,11 +5,17 @@ import type { QRPayload } from './useQRFrame'
 
 export interface ScanResult {
   payload: QRPayload
+  // When captureTime is available: scannedAt = camera hardware capture time,
+  // decodeDuration = 0 (captureTime is already before decoding).
+  // Otherwise: scannedAt = Date.now() after jsqr, decodeDuration = actual ms.
   decodeDuration: number
-  scannedAt: number  // Date.now() captured immediately after jsqr finishes
+  scannedAt: number
 }
 
 const MAX_SCAN_WIDTH = 640
+
+// performance.now() → Date.now() domain offset, computed once
+const perfToDateOffset = Date.now() - performance.now()
 
 export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>) {
   const [result, setResult] = useState<ScanResult | null>(null)
@@ -22,9 +28,35 @@ export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d', { willReadFrequently: true })!
 
+    // Accurate camera capture time in Date.now() domain.
+    // null = requestVideoFrameCallback not yet available or not supported.
+    let captureTimeMs: number | null = null
+    let vfcActive = true
+    let vfcSetup = false
+
+    function setupCaptureTracking(video: HTMLVideoElement) {
+      if (!('requestVideoFrameCallback' in video)) return
+
+      const onFrame = (_: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata) => {
+        if (!vfcActive) return
+        if (metadata.captureTime !== undefined) {
+          // captureTime is in performance.now() domain — convert to Date.now()
+          captureTimeMs = metadata.captureTime + perfToDateOffset
+        }
+        video.requestVideoFrameCallback(onFrame)
+      }
+      video.requestVideoFrameCallback(onFrame)
+    }
+
     function scan() {
       const video = videoRef.current
       if (video && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+        // Set up hardware capture-time tracking once the video is playing
+        if (!vfcSetup) {
+          vfcSetup = true
+          setupCaptureTracking(video)
+        }
+
         const scale = Math.min(1, MAX_SCAN_WIDTH / video.videoWidth)
         canvas.width = Math.round(video.videoWidth * scale)
         canvas.height = Math.round(video.videoHeight * scale)
@@ -38,9 +70,15 @@ export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>)
         if (code) {
           const payload = decodeQRPayload(code.data)
           if (payload) {
-            const scannedAt = Date.now()
-            lastSuccessRef.current = scannedAt
-            setResult({ payload, decodeDuration, scannedAt })
+            // captureTime → scannedAt is when the camera physically captured the
+            // frame containing this QR. decodeDuration = 0 because captureTime
+            // is already before decoding started. This removes the webcam
+            // pipeline latency from the measurement.
+            const scannedAt = captureTimeMs ?? Date.now()
+            const effectiveDecodeDuration = captureTimeMs != null ? 0 : decodeDuration
+
+            lastSuccessRef.current = Date.now()
+            setResult({ payload, decodeDuration: effectiveDecodeDuration, scannedAt })
           }
         }
       }
@@ -55,7 +93,10 @@ export function useQRScanner(videoRef: React.RefObject<HTMLVideoElement | null>)
     }
 
     rafRef.current = requestAnimationFrame(scan)
-    return () => cancelAnimationFrame(rafRef.current)
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      vfcActive = false
+    }
   }, [videoRef])
 
   return { result, isTracking }

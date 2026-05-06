@@ -45,15 +45,63 @@
 
 .footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 6px;
+}
+
+.footerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .count {
   font-size: clamp(9px, 2vw, 11px);
   color: rgba(255, 255, 255, 0.4);
+}
+
+.baselineBadge {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 4px;
+  color: #22c55e;
+  font-size: 10px;
+  padding: 1px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.baselineBadge:hover {
+  background: rgba(34, 197, 94, 0.35);
+}
+
+.buttons {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.calibrate {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #fff;
+  font-size: clamp(9px, 2vw, 11px);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.calibrate:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.calibrate:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .reset {
@@ -62,7 +110,7 @@
   border-radius: 6px;
   color: #fff;
   font-size: clamp(9px, 2vw, 11px);
-  padding: 3px 10px;
+  padding: 3px 8px;
   cursor: pointer;
   transition: background 0.15s;
 }

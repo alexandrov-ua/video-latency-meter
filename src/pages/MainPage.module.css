@@ -10,7 +10,7 @@
 }
 
 .qrWrapper {
-  width: min(100vw, 100svh);
+  width: min(82vw, 82svh);
   aspect-ratio: 1;
   display: flex;
   align-items: center;

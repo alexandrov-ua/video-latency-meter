@@ -7,9 +7,9 @@ import StatsPanel from '../components/StatsPanel'
 import styles from './MainPage.module.css'
 
 export default function MainPage() {
-  const qrValue = useQRFrame()
+  const { qrValue, renderOffsetRef } = useQRFrame()
   const { videoRef, devices, deviceId, setDeviceId } = useCamera()
-  const { samples, addScan, reset } = useLatency()
+  const { samples, addScan, reset } = useLatency(renderOffsetRef)
 
   return (
     <div className={styles.page}>
@@ -18,7 +18,7 @@ export default function MainPage() {
           value={qrValue}
           size={1024}
           className={styles.qr}
-          marginSize={2}
+          marginSize={4}
         />
       </div>
 
